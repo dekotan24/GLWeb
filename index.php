@@ -157,8 +157,8 @@ echo "          </tr>";
 foreach($results as $row) {
     $total = (int) $row['UPTIME'];
     $runCount = (int) $row['RUN_COUNT'];
-    $hour = floor($total / 60);
-    $min = floor($total % 60);
+    $hour = floor($total / 60 / 60);
+    $min = floor(($total / 60) % 60);
     echo "<tr>";
     echo "<td>" . $row['GAME_NAME'] . "</td>";
     echo "<td>" . $row['STATUS'] . "</td>";
