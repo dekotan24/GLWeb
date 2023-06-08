@@ -3,7 +3,7 @@ echo "Game Launcher Web Viewer";
 
 $DBHost = 'localhost';
 $DBName = 'gl';
-$DBTable = 'gl_table1';
+$DBTable = 'gl_item1';
 $DBUser = 'username';
 $DBPass = 'password';
 
@@ -26,7 +26,7 @@ if(isset($_GET['orderTarget']))
 }
 
 $pdo = new PDO('mysql:dbname='.$DBName.';host='.$DBHost.';', $DBUser, $DBPass);
-$queryStmt = 'SELECT * FROM '.$DBTable;
+$queryStmt = 'SELECT GAME_NAME, STATUS, CAST(RUN_COUNT as SIGNED) AS RUN_COUNT, CAST(UPTIME as SIGNED) AS UPTIME, CAST(LAST_RUN as DATETIME) AS LAST_RUN FROM '.$DBTable;
 
 if(!empty($searchcmd))
 {
@@ -159,11 +159,14 @@ foreach($results as $row) {
     $runCount = (int) $row['RUN_COUNT'];
     $hour = floor($total / 60 / 60);
     $min = floor(($total / 60) % 60);
+    $avgtotal = (int) $total / $runCount;
+    $avghour = (int) floor($avgtotal / 60 / 60);
+    $avgmin = floor(($avgtotal / 60) % 60);
     echo "<tr>";
     echo "<td>" . $row['GAME_NAME'] . "</td>";
     echo "<td>" . $row['STATUS'] . "</td>";
     echo "<td>" . $runCount . "</td>";
-    echo "<td>" . $hour . "時間" . $min . "分</td>";
+    echo "<td title='平均：".$avghour."時間".$avgmin."分'>" . $hour . "時間" . $min . "分</td>";
     echo "<td>" . $row['LAST_RUN'] . "</td>";
     echo "</tr>";
 }
