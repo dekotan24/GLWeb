@@ -1,46 +1,51 @@
 <?php
 echo "Game Launcher Web Viewer";
 
-$DBHost = 'localhost';
-$DBName = 'gl';
-$DBTable = 'gl_item1';
-$DBUser = 'username';
-$DBPass = 'password';
+/* it requires MySQL database. */
+
+$DBHost = 'localhost';	// set your database host
+$DBName = 'gl';			// set your database name
+$DBTable = 'gl_item1';	// set your table name
+$DBUser = 'username';	// set your database username
+$DBPass = 'password';	// set your database password
+
+$showQuery = false;		// debug mode (when true, executed query shows at the bottom of the page)
 
 $searchcmd = '';
 $searchOrder = '';
 
-if(isset($_GET['title']) && $_GET['title'] !== '')
-{
-    $searchcmd = "GAME_NAME LIKE '%" . htmlspecialchars_decode($_GET['title']) . "%'";
-}
-
-if(isset($_GET['status']) && $_GET['status'] !== '')
-{
-    $searchcmd = (mb_strlen($searchcmd) > 0 ? $searchcmd." AND " : "")."status = '".htmlspecialchars_decode($_GET['status'])."'";
-}
-
-if(isset($_GET['orderTarget']))
-{
-    $searchOrder = $_GET['orderTarget'] . " " . $_GET['orderFlg'];
-}
-
 $pdo = new PDO('mysql:dbname='.$DBName.';host='.$DBHost.';', $DBUser, $DBPass);
-$queryStmt = 'SELECT GAME_NAME, STATUS, CAST(RUN_COUNT as SIGNED) AS RUN_COUNT, CAST(UPTIME as SIGNED) AS UPTIME, CAST(LAST_RUN as DATETIME) AS LAST_RUN FROM '.$DBTable;
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-if(!empty($searchcmd))
-{
-    $queryStmt .= ' WHERE ' . $searchcmd;
+$params = array();
+$queryStmt = 'SELECT GAME_NAME, STATUS, CAST(RUN_COUNT as SIGNED) AS RUN_COUNT, CAST(UPTIME as SIGNED) AS UPTIME, CAST(LAST_RUN as DATETIME) AS LAST_RUN FROM '.$DBTable;
+$whereConditions = array();
+
+if(isset($_GET['title']) && $_GET['title'] !== '') {
+    $whereConditions[] = "GAME_NAME LIKE :title";
+    $params[':title'] = "%".$_GET['title']."%";
 }
 
-if(!empty($searchOrder))
-{
-    $queryStmt .= " ORDER BY " . $searchOrder;
+if(isset($_GET['status']) && $_GET['status'] !== '') {
+    $whereConditions[] = "status = :status";
+    $params[':status'] = $_GET['status'];
+}
+
+if(!empty($whereConditions)) {
+    $queryStmt .= ' WHERE ' . implode(' AND ', $whereConditions);
+}
+
+if(isset($_GET['orderTarget']) && isset($_GET['orderFlg'])) {
+    $queryStmt .= " ORDER BY " . $_GET['orderTarget'] . " " . $_GET['orderFlg'];
 }
 
 $stmt = $pdo->prepare($queryStmt);
-$stmt->execute();
 
+foreach($params as $key => &$val) {
+    $stmt->bindParam($key, $val, PDO::PARAM_STR);
+}
+
+$stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo "<html lang='ja'>";
@@ -162,17 +167,22 @@ foreach($results as $row) {
     $avgtotal = (int) $total / $runCount;
     $avghour = (int) floor($avgtotal / 60 / 60);
     $avgmin = floor(($avgtotal / 60) % 60);
+	$dialogText = $row['GAME_NAME']."\n\n"."合計：".$hour."時間".$min."分\n"."平均：".$avghour."時間".$avgmin."分（起動回数：".$runCount."）";
     echo "<tr>";
     echo "<td>" . $row['GAME_NAME'] . "</td>";
     echo "<td>" . $row['STATUS'] . "</td>";
     echo "<td>" . $runCount . "</td>";
-    echo "<td title='平均：".$avghour."時間".$avgmin."分'>" . $hour . "時間" . $min . "分</td>";
+    echo "<td title='平均：".$avghour."時間".$avgmin."分' onclock='".$dialogText."'>" . $hour . "時間" . $min . "分</td>";
     echo "<td>" . $row['LAST_RUN'] . "</td>";
     echo "</tr>";
 }
 
 echo "      </table>";
-echo "<small><a href='https://github.com/dekotan24/GLWeb' target='_blank'>GitHub</a> | Executed Query: ".$queryStmt."</small>";
+echo "		<small><a href='https://github.com/dekotan24/GLWeb' target='_blank'>GitHub</a>";
+if ($showQuery === true) {
+    echo " | Executed Query: " . $queryStmt;
+}
+echo "		</small>";
 echo "  </body>";
 echo "</html>";
 
