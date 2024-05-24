@@ -134,6 +134,8 @@ echo "                  <option value=''>全て</option>";
 echo "                  <option value='未プレイ'>未プレイ</option>";
 echo "                  <option value='プレイ中'>プレイ中</option>";
 echo "                  <option value='プレイ済'>プレイ済</option>";
+echo "                  <option value='未攻略'>未攻略</option>";
+echo "                  <option value='攻略中'>攻略中</option>";
 echo "                  <option value='攻略済'>攻略済</option>";
 echo "              </select>";
 echo "              <select name='orderTarget' class='order-select' value='".htmlspecialchars_decode($_GET['orderTarget'])."'>";
