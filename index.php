@@ -36,7 +36,7 @@ if(!empty($whereConditions)) {
 }
 
 if(isset($_GET['orderTarget']) && isset($_GET['orderFlg'])) {
-    $queryStmt .= " ORDER BY :orderTarget " . if($_GET['orderFlg']==="asc"){"ASC"}else{"DESC"};
+    $queryStmt .= " ORDER BY :orderTarget " . substr($_GET['orderFlg'], 4);
     $params[':orderTarget'] = $_GET['orderTarget'];
 }
 
