@@ -4,12 +4,12 @@ echo "Game Launcher Web Viewer";
 /* it requires MySQL database. */
 
 $DBHost = 'localhost';	// set your database host
-$DBName = 'gl';			// set your database name
+$DBName = 'gl';		// set your database name
 $DBTable = 'gl_item1';	// set your table name
 $DBUser = 'username';	// set your database username
 $DBPass = 'password';	// set your database password
 
-$showQuery = false;		// debug mode (when true, executed query shows at the bottom of the page)
+$showQuery = false;	// debug mode (when true, executed query shows at the bottom of the page)
 
 $searchcmd = '';
 $searchOrder = '';
@@ -169,12 +169,12 @@ foreach($results as $row) {
     $avgtotal = (int) $total / $runCount;
     $avghour = (int) floor($avgtotal / 60 / 60);
     $avgmin = floor(($avgtotal / 60) % 60);
-	$dialogText = $row['GAME_NAME']."\n\n"."合計：".$hour."時間".$min."分\n"."平均：".$avghour."時間".$avgmin."分（起動回数：".$runCount."）";
+
     echo "<tr>";
     echo "<td>" . $row['GAME_NAME'] . "</td>";
     echo "<td>" . $row['STATUS'] . "</td>";
     echo "<td>" . $runCount . "</td>";
-    echo "<td title='平均：".$avghour."時間".$avgmin."分' onclock='".$dialogText."'>" . $hour . "時間" . $min . "分</td>";
+    echo "<td title='平均：".$avghour."時間".$avgmin."分'>" . $hour . "時間" . $min . "分</td>";
     echo "<td>" . $row['LAST_RUN'] . "</td>";
     echo "</tr>";
 }
