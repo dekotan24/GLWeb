@@ -4,12 +4,12 @@ echo "Game Launcher Web Viewer";
 /* it requires MySQL database. */
 
 $DBHost = 'localhost';	// set your database host
-$DBName = 'gl';		// set your database name
+$DBName = 'gl';		    // set your database name
 $DBTable = 'gl_item1';	// set your table name
 $DBUser = 'username';	// set your database username
 $DBPass = 'password';	// set your database password
 
-$showQuery = false;	// debug mode (when true, executed query shows at the bottom of the page)
+$showQuery = false;	    // debug mode (when true, executed query shows at the bottom of the page)
 
 $searchcmd = '';
 $searchOrder = '';
@@ -36,7 +36,8 @@ if(!empty($whereConditions)) {
 }
 
 if(isset($_GET['orderTarget']) && isset($_GET['orderFlg'])) {
-    $queryStmt .= " ORDER BY " . $_GET['orderTarget'] . " " . $_GET['orderFlg'];
+    $queryStmt .= " ORDER BY :orderTarget " . if($_GET['orderFlg']==="asc"){"ASC"}else{"DESC"};
+    $params[':orderTarget'] = $_GET['orderTarget'];
 }
 
 $stmt = $pdo->prepare($queryStmt);
